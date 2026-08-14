@@ -1,0 +1,38 @@
+# Esegue lo script di raccolta dati automaticamente, senza bisogno di un server acceso.
+# GitHub lo avvia da solo secondo l'orario impostato ("schedule"), lo esegue nei suoi
+# server temporanei, e se data.json risulta cambiato lo salva nel repository (commit).
+# Il sito (se pubblicato su Netlify/GitHub Pages collegato a questo repository) si
+# ripubblica da solo leggendo il nuovo data.json — questo è il pezzo che rende il
+# sistema "autonomo" senza dover pagare o gestire un server permanente.
+
+name: Aggiorna dati investimenti
+
+on:
+  schedule:
+    - cron: '0 3 * * *'   # ogni notte alle 03:00 UTC — modificabile
+  workflow_dispatch:        # permette anche di lanciarlo a mano dal sito di GitHub
+
+jobs:
+  aggiorna:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Imposta Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installa dipendenze
+        run: pip install requests beautifulsoup4
+
+      - name: Esegui raccolta dati
+        run: python raccolta_dati_investimenti.py
+
+      - name: Salva data.json se cambiato
+        run: |
+          git config user.name "Bot raccolta dati"
+          git config user.email "bot@users.noreply.github.com"
+          git add data.json
+          git diff --staged --quiet || git commit -m "Aggiornamento dati automatico $(date +%F)"
+          git push
