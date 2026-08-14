@@ -82,19 +82,44 @@ def salva_data_json(dati: dict):
         json.dump(dati, f, ensure_ascii=False, indent=2)
 
 
-def fetch_prezzo_medio_requot(nome_comune: str) -> float | None:
-    """
-    Prova a leggere il prezzo medio al mq degli appartamenti dalla pagina Requot
-    del comune. Ritorna None se non riesce (il valore esistente in data.json
-    resta invariato, non viene mai cancellato).
+def _to_float(s: str) -> float:
+    return float(s.replace(".", "").replace(",", "."))
 
-    DA VERIFICARE: pattern regex ricostruito da testo visto nei risultati di ricerca,
-    non dall'HTML reale — controllare con `print(soup.prettify()[:3000])` al primo run.
+
+def _estrai_range(testo: str, categoria_regex: str) -> tuple[float, float] | None:
+    """
+    Cerca nel testo della pagina una frase del tipo:
+    "i valori immobiliari dei negozi in queste zone variano da un minimo
+     di 420 €/mq ... ad un massimo di 1.750 €/mq"
+    e ne estrae il minimo e il massimo.
+
+    DA VERIFICARE: pattern ricostruito da testo visto nei risultati di ricerca durante
+    la conversazione, non da un controllo diretto dell'HTML — verificare al primo run
+    stampando `testo[:2000]` per confermare la formulazione esatta usata dal sito.
+    """
+    pattern = re.compile(
+        categoria_regex + r"[^0-9]{0,80}?minim\w*\s*(?:di\s*)?(\d[\d.,]*)\s*€/mq"
+        r"[^0-9]{0,200}?massim\w*\s*(?:di\s*)?(\d[\d.,]*)\s*€/mq",
+        re.I,
+    )
+    m = pattern.search(testo)
+    if not m:
+        return None
+    return _to_float(m.group(1)), _to_float(m.group(2))
+
+
+def fetch_valori_requot(nome_comune: str) -> dict:
+    """
+    Legge dalla pagina Requot del comune i range di prezzo per appartamenti,
+    negozi e uffici. Ritorna un dizionario con le chiavi trovate; le categorie
+    non trovate restano assenti (il valore esistente in data.json non viene
+    mai cancellato da un mancato match — solo aggiornato se troviamo qualcosa
+    di nuovo).
     """
     slug = SLUG_REQOT.get(nome_comune)
     if not slug:
         log.warning(f"Nessuno slug Requot noto per '{nome_comune}' — salto.")
-        return None
+        return {}
 
     url = f"https://www.requot.com/valutazione-immobili/{slug}.html"
     try:
@@ -102,19 +127,30 @@ def fetch_prezzo_medio_requot(nome_comune: str) -> float | None:
         resp.raise_for_status()
     except requests.RequestException as e:
         log.error(f"Errore di rete su {nome_comune}: {e}")
-        return None
+        return {}
 
     soup = BeautifulSoup(resp.text, "html.parser")
     testo = soup.get_text(" ", strip=True)
 
-    # Cerca un pattern tipo "quotazioni immobiliari medie" seguito da un valore in €/mq.
-    # DA VERIFICARE contro l'HTML reale.
-    match = re.search(r"quotazion\w+ immobiliar\w+ medi\w*[^0-9]{0,60}?(\d[\d.,]*)\s*€/mq", testo, re.I)
-    if not match:
-        log.warning(f"Pattern prezzo non trovato per {nome_comune} — parsing da rivedere.")
-        return None
+    risultati = {}
 
-    return float(match.group(1).replace(".", "").replace(",", "."))
+    appartamenti = _estrai_range(testo, r"appartament\w+")
+    if appartamenti:
+        risultati["prezzo"] = appartamenti[1]  # usiamo il massimo come proxy del "medio-alto" della zona migliore;
+        # in alternativa si può tenere sia min sia max — valutare quale serve meglio al sito una volta visti i dati reali
+
+    negozi = _estrai_range(testo, r"negoz\w+")
+    if negozi:
+        risultati["negozi"] = {"min": negozi[0], "max": negozi[1]}
+
+    uffici = _estrai_range(testo, r"uffic\w+")
+    if uffici:
+        risultati["uffici"] = {"min": uffici[0], "max": uffici[1]}
+
+    if not risultati:
+        log.warning(f"Nessun valore estratto per {nome_comune} — parsing da rivedere.")
+
+    return risultati
 
 
 def main():
@@ -125,15 +161,15 @@ def main():
     for comune in dati["comuni"]:
         nome = comune["nome"]
         log.info(f"Controllo {nome}…")
-        nuovo_prezzo = fetch_prezzo_medio_requot(nome)
+        trovati = fetch_valori_requot(nome)
 
-        if nuovo_prezzo is not None:
-            vecchio = comune["prezzo"]
-            comune["prezzo"] = nuovo_prezzo
-            log.info(f"  {nome}: prezzo {vecchio} → {nuovo_prezzo} €/mq")
+        if trovati:
+            for campo, valore in trovati.items():
+                comune[campo] = valore
+            log.info(f"  {nome}: aggiornati i campi {list(trovati.keys())}")
             aggiornati += 1
         else:
-            log.info(f"  {nome}: nessun aggiornamento (dato precedente mantenuto)")
+            log.info(f"  {nome}: nessun aggiornamento (dati precedenti mantenuti)")
 
         time.sleep(2)  # pausa di cortesia tra le richieste
 
@@ -142,7 +178,7 @@ def main():
     log.info(f"Fatto. {aggiornati}/{len(dati['comuni'])} comuni aggiornati. "
              f"data.json salvato con timestamp {oggi}.")
     log.info("Nota: stato PUG, punteggio edificabilità e zone OMI restano quelli "
-             "raccolti a mano — non toccati da questo script.")
+             "raccolti a mano — non toccati da questo script. Terreni non ancora inclusi.")
 
 
 if __name__ == "__main__":

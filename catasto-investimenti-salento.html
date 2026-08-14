@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catasto Investimenti — Salento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ECE7D8;
+    --paper-deep:#E3DCC8;
+    --ink:#1E2A38;
+    --ink-soft:#4B5A67;
+    --rule:#C8BFA6;
+    --seal-good:#3F6E64;
+    --seal-good-bg:#DCE7E1;
+    --seal-mid:#8A6D2E;
+    --seal-mid-bg:#EDE3C9;
+    --seal-bad:#A13D2C;
+    --seal-bad-bg:#EDDAD3;
+    --seal-na:#8A8272;
+    --seal-na-bg:#E3DDCC;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+    --sans: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(30,42,56,0.035) 28px),
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    padding:32px 20px 80px;
+    min-height:100vh;
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+
+  header.masthead{
+    border-bottom:3px double var(--ink);
+    padding-bottom:18px;
+    margin-bottom:28px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  header.masthead .title{
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:clamp(28px,4vw,40px);
+    letter-spacing:-0.01em;
+    line-height:1.05;
+  }
+  header.masthead .title small{
+    display:block;
+    font-family:var(--mono);
+    font-weight:500;
+    font-size:12.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  header.masthead .meta{
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:var(--ink-soft);
+    text-align:right;
+    line-height:1.6;
+  }
+
+  .search-panel{
+    background:var(--paper-deep);
+    border:1px solid var(--rule);
+    padding:18px 20px;
+    margin-bottom:26px;
+    position:relative;
+  }
+  .search-panel::before{
+    content:"REGISTRO COMUNI";
+    position:absolute;
+    top:-10px;
+    left:16px;
+    background:var(--paper);
+    padding:0 8px;
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:0.16em;
+    color:var(--ink-soft);
+  }
+  .search-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  #searchInput{
+    flex:1 1 260px;
+    font-family:var(--serif);
+    font-size:18px;
+    background:var(--paper);
+    border:1px solid var(--rule);
+    padding:10px 14px;
+    color:var(--ink);
+    outline:none;
+  }
+  #searchInput:focus{border-color:var(--seal-good);}
+  .sort-select{
+    font-family:var(--mono);
+    font-size:12px;
+    background:var(--paper);
+    border:1px solid var(--rule);
+    color:var(--ink);
+    padding:9px 10px;
+  }
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;}
+  .chip{
+    font-family:var(--mono);
+    font-size:11px;
+    padding:5px 10px;
+    border:1px solid var(--rule);
+    background:var(--paper);
+    cursor:pointer;
+    color:var(--ink-soft);
+    transition:background .15s, color .15s;
+  }
+  .chip:hover, .chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  .list{display:flex;flex-direction:column;border-top:1px solid var(--rule);margin-bottom:36px;}
+  .row{
+    display:grid;
+    grid-template-columns:1fr auto auto auto;
+    gap:14px;
+    align-items:center;
+    padding:11px 6px;
+    border-bottom:1px solid var(--rule);
+    cursor:pointer;
+    transition:background .12s;
+  }
+  .row:hover{background:rgba(63,110,100,0.08);}
+  .row .name{font-family:var(--serif);font-size:16.5px;font-weight:600;}
+  .row .sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);display:block;margin-top:1px;}
+  .row .figure{font-family:var(--mono);font-size:13px;text-align:right;min-width:64px;}
+  .row .figure .lbl{display:block;font-size:9px;color:var(--ink-soft);letter-spacing:.06em;}
+  .seal{
+    width:38px;height:38px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-weight:600;font-size:12px;
+    border:2px solid currentColor;
+    flex-shrink:0;
+  }
+  @media (max-width:600px){
+    .row{grid-template-columns:1fr auto;}
+    .row .figure:nth-of-type(1){display:none;}
+  }
+
+  .dossier{display:none;border:1px solid var(--ink);background:var(--paper);position:relative;padding:0;}
+  .dossier.show{display:block;}
+  .dossier-head{
+    padding:22px 24px 18px;
+    border-bottom:3px double var(--ink);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:18px;
+    flex-wrap:wrap;
+  }
+  .dossier-head h2{
+    font-family:var(--serif);font-size:28px;margin:0 0 4px;font-weight:700;
+  }
+  .dossier-head .pop{font-family:var(--mono);font-size:12px;color:var(--ink-soft);}
+  .seal-big{
+    width:74px;height:74px;border-radius:50%;
+    border:3px solid currentColor;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-family:var(--mono);
+    transform:rotate(-6deg);
+    flex-shrink:0;
+  }
+  .seal-big .n{font-size:22px;font-weight:700;line-height:1;}
+  .seal-big .d{font-size:8px;letter-spacing:.08em;margin-top:2px;}
+
+  .section{padding:18px 24px;border-bottom:1px solid var(--rule);}
+  .section:last-child{border-bottom:none;}
+  .section h3{
+    font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-soft);margin:0 0 12px;
+  }
+  .ledger{width:100%;border-collapse:collapse;}
+  .ledger tr{border-bottom:1px dotted var(--rule);}
+  .ledger tr:last-child{border-bottom:none;}
+  .ledger td{padding:6px 4px;font-size:13.5px;}
+  .ledger td:first-child{color:var(--ink-soft);}
+  .ledger td:last-child{font-family:var(--mono);text-align:right;font-weight:500;}
+
+  .note-box{
+    background:var(--paper-deep);border-left:3px solid var(--seal-mid);
+    padding:10px 14px;font-size:13px;line-height:1.55;margin-top:10px;
+  }
+  .note-box.bad{border-left-color:var(--seal-bad);}
+  .note-box.good{border-left-color:var(--seal-good);}
+  .zone-table{width:100%;border-collapse:collapse;margin-top:8px;}
+  .zone-table td{padding:5px 4px;font-size:12.5px;border-bottom:1px dotted var(--rule);}
+  .zone-table td:last-child{font-family:var(--mono);text-align:right;}
+
+  .rel-tag{
+    display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.04em;
+    padding:2px 7px;border:1px solid currentColor;margin-left:8px;vertical-align:middle;
+  }
+
+  footer{
+    margin-top:30px;padding-top:16px;border-top:1px solid var(--rule);
+    font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);line-height:1.7;
+  }
+  footer strong{color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="title">
+      <small>Provincia di Lecce · dossier pilota</small>
+      Catasto Investimenti — Salento
+    </div>
+    <div class="meta">
+      17 comuni schedati<br>
+      <span id="lastUpdate">ultimo rilievo: —</span>
+    </div>
+  </header>
+
+  <div class="search-panel">
+    <div class="search-row">
+      <input id="searchInput" type="text" placeholder="Cerca un comune…" autocomplete="off">
+      <select id="sortSelect" class="sort-select">
+        <option value="name">Ordina: nome</option>
+        <option value="rendita">Ordina: rendita ↓</option>
+        <option value="punteggio">Ordina: punteggio edificabilità ↓</option>
+        <option value="migratorio">Ordina: saldo migratorio ↓</option>
+      </select>
+    </div>
+    <div class="chips" id="chipRow">
+      <div class="chip active" data-f="all">Tutti</div>
+      <div class="chip" data-f="scored">Con punteggio PUG</div>
+      <div class="chip" data-f="costiero">Zone costiere</div>
+    </div>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <div class="dossier" id="dossier"></div>
+
+  <footer>
+    <strong>Fonti:</strong> prezzi/canoni — Immobiliare.it (lug 2026) · popolazione/demografia — ISTAT/Tuttitalia (censimento 2011–21; saldi 2022–24, Nardò 2025) · stato piani urbanistici — stampa locale e siti comunali (ricerca ago 2026) · zone OMI — Requot / Agenzia delle Entrate.<br>
+    <strong>Nota sui dati:</strong> questa è una fotografia raccolta manualmente per il pilota, non un flusso live. Per un "sempre aggiornato" reale servirebbe una pipeline automatica (OMI a livello di zona, ISTAT, ISPRA) — vedi il foglio di lavoro per il piano di sviluppo.<br>
+    <strong>Punteggio edificabilità:</strong> stima ragionata su segnali pubblici, non un dato statistico validato — non sostituisce una verifica professionale (PPTR, catasto, piano vigente) prima di un investimento reale.
+  </footer>
+
+</div>
+
+<script>
+let DATA = [];
+
+async function caricaDati(){
+  try{
+    const resp = await fetch('data.json', {cache:'no-store'});
+    const json = await resp.json();
+    DATA = json.comuni.map(c => ({...c, n:c.nome}));
+    DATA.forEach(d=>{ d.rendita = (d.canone*12)/d.prezzo*100; });
+    const agg = document.getElementById('lastUpdate');
+    if(agg) agg.textContent = 'ultimo rilievo: ' + json.ultimo_aggiornamento;
+    renderList();
+  }catch(e){
+    document.getElementById('list').innerHTML =
+      '<div style="padding:24px 4px;font-family:var(--mono);font-size:12.5px;color:var(--seal-bad);">'
+      + 'Non riesco a caricare data.json — verifica che il file sia nella stessa cartella di questa pagina '
+      + '(se lo apri come file locale, alcuni browser bloccano il caricamento: prova con un piccolo server locale '
+      + 'o pubblicandolo su un hosting come Netlify).</div>';
+    console.error(e);
+  }
+}
+
+function sealClass(p){
+  if(p===null || p===undefined) return {cls:'na', label:'n.d.'};
+  if(p>=6) return {cls:'good', label:p+'/10'};
+  if(p>=4) return {cls:'mid', label:p+'/10'};
+  return {cls:'bad', label:p+'/10'};
+}
+function sealColor(cls){
+  return cls==='good' ? 'var(--seal-good)' : cls==='mid' ? 'var(--seal-mid)' : cls==='bad' ? 'var(--seal-bad)' : 'var(--seal-na)';
+}
+
+const list = document.getElementById('list');
+const dossier = document.getElementById('dossier');
+const searchInput = document.getElementById('searchInput');
+const sortSelect = document.getElementById('sortSelect');
+let activeFilter = 'all';
+
+function renderList(){
+  const q = searchInput.value.trim().toLowerCase();
+  let items = DATA.filter(d=>d.n.toLowerCase().includes(q));
+  if(activeFilter==='scored') items = items.filter(d=>d.punteggio!==null);
+  if(activeFilter==='costiero') items = items.filter(d=>d.coast);
+
+  const sortBy = sortSelect.value;
+  items = items.slice().sort((a,b)=>{
+    if(sortBy==='rendita') return b.rendita - a.rendita;
+    if(sortBy==='punteggio') return (b.punteggio??-1) - (a.punteggio??-1);
+    if(sortBy==='migratorio') return b.migratorio - a.migratorio;
+    return a.n.localeCompare(b.n);
+  });
+
+  list.innerHTML = '';
+  items.forEach(d=>{
+    const s = sealClass(d.punteggio);
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <div>
+        <span class="name">${d.n}</span>
+        <span class="sub">${d.pop.toLocaleString('it-IT')} ab. ${d.coast ? '· costiero':''}</span>
+      </div>
+      <div class="figure"><span class="lbl">RENDITA</span>${d.rendita.toFixed(1)}%</div>
+      <div class="figure"><span class="lbl">MIGRAT.</span>${d.migratorio>0?'+':''}${d.migratorio.toFixed(1)}‰</div>
+      <div class="seal" style="color:${sealColor(s.cls)};background:${s.cls==='na'?'var(--seal-na-bg)':s.cls==='good'?'var(--seal-good-bg)':s.cls==='mid'?'var(--seal-mid-bg)':'var(--seal-bad-bg)'}">${d.punteggio!==null?d.punteggio:'—'}</div>
+    `;
+    row.addEventListener('click', ()=>showDossier(d.n));
+    list.appendChild(row);
+  });
+  if(items.length===0){
+    list.innerHTML = '<div style="padding:24px 4px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);">Nessun comune corrisponde alla ricerca.</div>';
+  }
+}
+
+function showDossier(name){
+  const d = DATA.find(x=>x.n===name);
+  if(!d) return;
+  const s = sealClass(d.punteggio);
+  dossier.classList.add('show');
+
+  let zoneHTML = '';
+  if(d.zone.length){
+    zoneHTML = `<div class="section"><h3>Dentro il comune — differenze per zona OMI</h3><table class="zone-table">
+      ${d.zone.map(z=>`<tr><td>${z[0]}</td><td>${z[1]}</td></tr>`).join('')}
+    </table></div>`;
+  }
+
+  let anomaliaHTML = '';
+  if(d.anomalia){
+    anomaliaHTML = `<div class="note-box bad">⚠ ${d.anomalia}</div>`;
+  }
+
+  dossier.innerHTML = `
+    <div class="dossier-head">
+      <div>
+        <h2>${d.n}</h2>
+        <div class="pop">${d.pop.toLocaleString('it-IT')} abitanti ${d.coast ? '· comune costiero':'· entroterra'}</div>
+      </div>
+      <div class="seal-big" style="color:${sealColor(s.cls)};background:${s.cls==='na'?'var(--seal-na-bg)':s.cls==='good'?'var(--seal-good-bg)':s.cls==='mid'?'var(--seal-mid-bg)':'var(--seal-bad-bg)'}">
+        <span class="n">${d.punteggio!==null?d.punteggio:'n.d.'}</span>
+        <span class="d">${d.punteggio!==null?'/ 10':'nessun dato'}</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Prezzi &amp; rendita</h3>
+      <table class="ledger">
+        <tr><td>Prezzo medio vendita (residenziale)</td><td>${d.prezzo.toLocaleString('it-IT')} €/mq</td></tr>
+        <tr><td>Canone medio locazione</td><td>${d.canone.toFixed(2)} €/mq/mese</td></tr>
+        <tr><td>Rendita lorda stimata</td><td>${d.rendita.toFixed(1)}%</td></tr>
+        <tr><td>Negozi</td><td>${d.negozi && d.negozi.min!==null ? d.negozi.min+'–'+d.negozi.max+' €/mq' : 'n.d.'}</td></tr>
+        <tr><td>Uffici</td><td>${d.uffici && d.uffici.min!==null ? d.uffici.min+'–'+d.uffici.max+' €/mq' : 'n.d.'}</td></tr>
+      </table>
+      ${anomaliaHTML}
+    </div>
+
+    <div class="section">
+      <h3>Demografia</h3>
+      <table class="ledger">
+        <tr><td>Trend popolazione (2011–21)</td><td>${d.trend===null?'n.d.':(d.trend>0?'+':'')+d.trend+'%'}</td></tr>
+        <tr><td>Saldo naturale (nascite–morti)</td><td>${d.naturale>0?'+':''}${d.naturale.toFixed(1)}‰</td></tr>
+        <tr><td>Saldo migratorio</td><td>${d.migratorio>0?'+':''}${d.migratorio.toFixed(1)}‰</td></tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <h3>Piano urbanistico &amp; edificabilità futura</h3>
+      <p style="font-size:13.5px;line-height:1.6;margin:0 0 6px;">${d.pug}</p>
+      ${d.zonaCitata && d.zonaCitata!=='—' ? `<p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 8px;"><strong>Zona citata:</strong> ${d.zonaCitata}</p>` : ''}
+      <span class="rel-tag" style="color:${sealColor(s.cls==='na'?'na':'good')};">AFFIDABILITÀ: ${d.rel.toUpperCase()}</span>
+    </div>
+
+    ${zoneHTML}
+  `;
+  dossier.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+document.getElementById('chipRow').addEventListener('click', e=>{
+  const chip = e.target.closest('.chip');
+  if(!chip) return;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  activeFilter = chip.dataset.f;
+  renderList();
+});
+searchInput.addEventListener('input', renderList);
+sortSelect.addEventListener('change', renderList);
+
+caricaDati();
+</script>
+</body>
+</html>

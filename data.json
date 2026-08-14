@@ -23,7 +23,15 @@
           "B3 · Centro Storico",
           "1.700–1.800 €/mq"
         ]
-      ]
+      ],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": 730,
+        "max": 2400
+      }
     },
     {
       "nome": "Otranto",
@@ -38,7 +46,15 @@
       "punteggio": 4,
       "rel": "alta",
       "coast": true,
-      "zone": []
+      "zone": [],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     },
     {
       "nome": "Gallipoli",
@@ -53,7 +69,15 @@
       "punteggio": null,
       "rel": "bassa",
       "coast": true,
-      "zone": []
+      "zone": [],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     },
     {
       "nome": "Porto Cesareo",
@@ -68,7 +92,15 @@
       "punteggio": 7,
       "rel": "alta",
       "coast": true,
-      "zone": []
+      "zone": [],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     },
     {
       "nome": "Castro",
@@ -83,7 +115,15 @@
       "punteggio": null,
       "rel": "bassa",
       "coast": true,
-      "zone": []
+      "zone": [],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     },
     {
       "nome": "Santa Cesarea Terme",
@@ -98,7 +138,15 @@
       "punteggio": null,
       "rel": "bassa",
       "coast": true,
-      "zone": []
+      "zone": [],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     },
     {
       "nome": "Nardò",
@@ -113,7 +161,15 @@
       "punteggio": 5,
       "rel": "media — processo opaco, non politico",
       "coast": false,
-      "zone": []
+      "zone": [],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     },
     {
       "nome": "Melendugno",
@@ -137,7 +193,15 @@
           "E4 · Marine San Foca e Torre dell'Orso",
           "1.200–1.750 €/mq"
         ]
-      ]
+      ],
+      "negozi": {
+        "min": 420,
+        "max": 1750
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     },
     {
       "nome": "Ugento",
@@ -161,7 +225,15 @@
           "E5 · Marine: Torre San Giovanni, Torre Mozza, Lido Marini",
           "1.150–1.300 €/mq"
         ]
-      ]
+      ],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": 690,
+        "max": 880
+      }
     },
     {
       "nome": "Parabita",
@@ -176,7 +248,15 @@
       "punteggio": null,
       "rel": "bassa",
       "coast": false,
-      "zone": []
+      "zone": [],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     },
     {
       "nome": "Galatina",
@@ -191,7 +271,15 @@
       "punteggio": null,
       "rel": "bassa",
       "coast": false,
-      "zone": []
+      "zone": [],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     },
     {
       "nome": "Matino",
@@ -206,7 +294,15 @@
       "punteggio": null,
       "rel": "bassa",
       "coast": false,
-      "zone": []
+      "zone": [],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     },
     {
       "nome": "Maglie",
@@ -221,7 +317,15 @@
       "punteggio": null,
       "rel": "bassa",
       "coast": false,
-      "zone": []
+      "zone": [],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     },
     {
       "nome": "Casarano",
@@ -236,7 +340,15 @@
       "punteggio": null,
       "rel": "bassa",
       "coast": false,
-      "zone": []
+      "zone": [],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     },
     {
       "nome": "Taviano",
@@ -251,7 +363,15 @@
       "punteggio": null,
       "rel": "media (avvio confermato, direzione ignota)",
       "coast": false,
-      "zone": []
+      "zone": [],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     },
     {
       "nome": "Racale",
@@ -266,7 +386,15 @@
       "punteggio": null,
       "rel": "bassa",
       "coast": false,
-      "zone": []
+      "zone": [],
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     },
     {
       "nome": "Minervino di Lecce",
@@ -282,7 +410,15 @@
       "rel": "bassa",
       "coast": false,
       "zone": [],
-      "anomalia": "Canone dichiarato +208% su base annua nella fonte originale — probabile dato poco affidabile per scarsità di annunci. Non usare la rendita di questo comune senza verifica diretta."
+      "anomalia": "Canone dichiarato +208% su base annua nella fonte originale — probabile dato poco affidabile per scarsità di annunci. Non usare la rendita di questo comune senza verifica diretta.",
+      "negozi": {
+        "min": null,
+        "max": null
+      },
+      "uffici": {
+        "min": null,
+        "max": null
+      }
     }
   ]
 }
