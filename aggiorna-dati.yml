@@ -1,10 +1,3 @@
-# Esegue lo script di raccolta dati automaticamente, senza bisogno di un server acceso.
-# GitHub lo avvia da solo secondo l'orario impostato ("schedule"), lo esegue nei suoi
-# server temporanei, e se data.json risulta cambiato lo salva nel repository (commit).
-# Il sito (se pubblicato su Netlify/GitHub Pages collegato a questo repository) si
-# ripubblica da solo leggendo il nuovo data.json — questo è il pezzo che rende il
-# sistema "autonomo" senza dover pagare o gestire un server permanente.
-
 name: Aggiorna dati investimenti
 
 on:
